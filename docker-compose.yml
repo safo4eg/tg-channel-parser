@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  nginx:
+    container_name: tcp-nginx
+    image: nginx:stable-alpine
+    ports:
+      - "${HTTP_PORT:-8090}:80"
+    volumes:
+      - ./_docker/nginx/conf.d:/etc/nginx/conf.d/default.conf
+      - ./:/var/www
+    working_dir: /var/www
+    restart: unless-stopped
+    networks:
+      - tcp-network
+  app:
+    container_name: tcp-app
+    build: ./_docker/php
+    volumes:
+      - ./:/var/www
+    restart: unless-stopped
+    depends_on:
+      - nginx
+    networks:
+      - tcp-network
+
+
+networks:
+  tcp-network:
+    driver: bridge
