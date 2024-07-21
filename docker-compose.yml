@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   nginx:
-    container_name: tcp-nginx
+    container_name: tcp_nginx
     image: nginx:stable-alpine
     ports:
       - "${HTTP_PORT:-8090}:80"
@@ -14,17 +14,41 @@ services:
     networks:
       - tcp-network
   app:
-    container_name: tcp-app
+    container_name: tcp_app
     build: ./_docker/php
     volumes:
       - ./:/var/www
     restart: unless-stopped
     depends_on:
       - nginx
+      - mysql
+      - phpmyadmin
     networks:
       - tcp-network
-
-
+  mysql:
+    container_name: tcp_db
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+    volumes:
+      - ./db:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - tcp-network
+  phpmyadmin:
+    container_name: tcp_phpmyadmin
+    image: phpmyadmin
+    ports:
+      - "33060:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    depends_on:
+      - mysql
+    restart: unless-stopped
+    networks:
+      - tcp-network
 networks:
   tcp-network:
     driver: bridge
