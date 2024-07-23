@@ -7,7 +7,6 @@ use danog\MadelineProto\Settings;
 use \danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\AppInfo;
 use Illuminate\Support\Facades\Storage;
-use function Laravel\Prompts\info;
 
 class MadelineHelper
 {
@@ -15,11 +14,9 @@ class MadelineHelper
 
     public static function getMadelineProtoInstance(string $phoneNumber): API
     {
-        $dbSettings = self::getDatabaseSettings();
         $appInfo = self::getAppInfo();
         $settings = (new Settings())
-            ->setAppInfo($appInfo)
-            ->setDb($dbSettings);
+            ->setAppInfo($appInfo);
 
         $sessionDirectory = self::getLocalConfig('sessions_directory');
         $sessionDirectoryPath = storage_path("app/$sessionDirectory");
@@ -32,16 +29,16 @@ class MadelineHelper
         return $madelineProto;
     }
 
-    private static function getDatabaseSettings(): Mysql
-    {
-        $config = self::getLocalConfig('database');
-
-        return (new Mysql())
-            ->setUri('tcp://' . $config['host'] . ':' . $config['port'])
-            ->setDatabase($config['database'])
-            ->setUsername($config['username'])
-            ->setPassword($config['password']);
-    }
+//    private static function getDatabaseSettings(): Mysql
+//    {
+//        $config = self::getLocalConfig('database');
+//
+//        return (new Mysql())
+//            ->setUri('tcp://' . $config['host'] . ':' . $config['port'])
+//            ->setDatabase($config['database'])
+//            ->setUsername($config['username'])
+//            ->setPassword($config['password']);
+//    }
 
     private static function getAppInfo(): AppInfo
     {
